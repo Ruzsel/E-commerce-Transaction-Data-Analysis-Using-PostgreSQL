@@ -155,7 +155,7 @@ LIMIT 5;
 
 ---
 
-### 5. Sort these products based on their transaction values, starting from the 5th product:
+### 5. Sort these products based on their transaction values in 2021, 2022, and total transaction values from both year!
 - Lenovo
 - Huawei
 - Sony
@@ -174,7 +174,8 @@ WITH sku_sales AS (
 			WHEN UPPER(sku_detail.sku_name) LIKE '%HUAWEI%' THEN 'Huawei'
 			WHEN UPPER(sku_detail.sku_name) LIKE '%LENOVO%' THEN 'Lenovo'
         END AS product_names,
-        order_detail.after_discount
+        order_detail.after_discount,
+        EXTRACT(YEAR FROM order_detail.order_date) AS year
     FROM
         sku_detail
     JOIN
@@ -185,6 +186,8 @@ WITH sku_sales AS (
 )
 SELECT
     product_names,
+    SUM(CASE WHEN year = 2021 THEN ROUND(after_discount) ELSE 0 END) AS total_transaction_value_2021,
+    SUM(CASE WHEN year = 2022 THEN ROUND(after_discount) ELSE 0 END) AS total_transaction_value_2022,
     SUM(ROUND(after_discount)) AS total_transaction_value
 FROM 
     sku_sales
@@ -193,9 +196,10 @@ GROUP BY
 HAVING
     product_names IS NOT NULL
 ORDER BY
-    total_transaction_value DESC;
+    total_transaction_value_2022 DESC;
 ```
 
-![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/4dc15113-94ac-40cc-b463-4c75b7aa9683)
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/675489cb-2707-4e9c-98d0-0b51b2b54642)
 
 ---
+
