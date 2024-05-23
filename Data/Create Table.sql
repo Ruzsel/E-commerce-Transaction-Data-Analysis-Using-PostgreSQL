@@ -35,5 +35,6 @@ CREATE TABLE order_detail (
     is_net BOOLEAN,
     payment_id INT,
     FOREIGN KEY (customer_id) REFERENCES customer_detail(id),
-    FOREIGN KEY (payment_id) REFERENCES payment_detail(id)
+    FOREIGN KEY (payment_id) REFERENCES payment_detail(id),
+    FOREIGN KEY (sku_id) REFERENCES sku_detail(id)
 );
