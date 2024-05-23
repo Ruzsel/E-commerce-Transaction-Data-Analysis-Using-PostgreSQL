@@ -6,7 +6,7 @@ CREATE TABLE customer_detail (
 
 -- Create table order_detail
 CREATE TABLE order_detail (
-    id VARCHAR(50) PRIMARY KEY,
+    id VARCHAR(50),
     customer_id VARCHAR(50),
     order_date DATE,
     sku_id VARCHAR(50),
