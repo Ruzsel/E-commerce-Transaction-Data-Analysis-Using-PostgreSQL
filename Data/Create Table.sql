@@ -4,6 +4,21 @@ CREATE TABLE customer_detail (
     registered_date DATE
 );
 
+-- Create table payment_detail
+CREATE TABLE payment_detail (
+    id INT PRIMARY KEY,
+    payment_method VARCHAR(50)
+);
+
+-- Create table sku_detail
+CREATE TABLE sku_detail (
+    id VARCHAR(50) PRIMARY KEY,
+    sku_name VARCHAR(255),
+    base_price NUMERIC,
+    cogs NUMERIC,
+    category VARCHAR(50)
+);
+
 -- Create table order_detail
 CREATE TABLE order_detail (
     id VARCHAR(50),
@@ -21,19 +36,4 @@ CREATE TABLE order_detail (
     payment_id INT,
     FOREIGN KEY (customer_id) REFERENCES customer_detail(id),
     FOREIGN KEY (payment_id) REFERENCES payment_detail(id)
-);
-
--- Create table payment_detail
-CREATE TABLE payment_detail (
-    id INT PRIMARY KEY,
-    payment_method VARCHAR(50)
-);
-
--- Create table sku_detail
-CREATE TABLE sku_detail (
-    id VARCHAR(50) PRIMARY KEY,
-    sku_name VARCHAR(255),
-    base_price NUMERIC,
-    cogs NUMERIC,
-    category VARCHAR(50)
 );
