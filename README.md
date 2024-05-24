@@ -39,13 +39,14 @@ The project includes the following tables:
   - payment_method: Payment method used.
 
 ## Bussines Questions
-### 1. During transactions that occurred both in 2021 and 2022, in which month did the total transaction value (after discount) reach its highest?
+## 1. During transactions that occurred both in 2021 and 2022, how did the discount amount value (discount_amount) perform in each month?
 
 ```sql
-SELECT 
+SELECT
     EXTRACT(YEAR FROM order_date) AS year,
-    EXTRACT(MONTH FROM order_date) AS month,
-    ROUND(SUM(after_discount::numeric)) AS total_transaction_value
+    TO_CHAR(order_date, 'Month') AS month,
+    ROUND(SUM(discount_amount::numeric)) AS total_discount_value,
+    ROUND(SUM(discount_amount::numeric) / COUNT(discount_amount)) AS average_discount_value
 FROM 
     order_detail
 WHERE 
@@ -53,49 +54,94 @@ WHERE
     AND EXTRACT(YEAR FROM order_date) IN (2021, 2022)
 GROUP BY  
     EXTRACT(YEAR FROM order_date),
-    EXTRACT(MONTH FROM order_date)
+    EXTRACT(MONTH FROM order_date),
+	month
 ORDER BY 
-    total_transaction_value DESC;
+    total_discount_value DESC;
 ```
 
-![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/74358f3c-6e0c-4393-8871-0d940bd1430d)
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/eb293fd4-0098-47ef-b827-e212fc2015c3)
+
+### Output : 
+### Discount Amount Value
+
+| year | month      | total_discount_value | average_discount_value |
+|------|------------|----------------------|------------------------|
+| 2021 | November   | 7178397              | 33860                  |
+| 2022 | December   | 1658148              | 19978                  |
+| 2022 | July       | 1353240              | 4994                   |
+| 2022 | May        | 884502               | 3567                   |
+| 2022 | April      | 863557               | 3628                   |
+| 2022 | June       | 858297               | 3716                   |
+| 2022 | November   | 851722               | 11061                  |
+| 2021 | September  | 598258               | 2462                   |
+| 2022 | March      | 467300               | 1657                   |
+| 2022 | January    | 304707               | 1019                   |
+| 2022 | October    | 238873               | 3318                   |
+| 2022 | August     | 207768               | 2361                   |
+| 2022 | February   | 128483               | 520                    |
+| 2021 | July       | 98066                | 395                    |
+| 2022 | September  | 74822                | 1025                   |
+| 2021 | June       | 58000                | 1000                   |
+| 2021 | October    | 29000                | 120                    |
+| 2021 | May        | 29000                | 518                    |
+| 2021 | March      | 11600                | 237                    |
+| 2021 | December   | 5800                 | 22                     |
+| 2021 | April      | 0                    | 0                      |
+| 2021 | August     | 0                    | 0                      |
+| 2021 | January    | 0                    | 0                      |
+| 2021 | February   | 0                    | 0                      |
 
 ---
 
-### 2. During transactions in both year 2021 and 2022, which TOP 5 category generated the highest transaction value?
+## 2. During transactions in both year 2021 and 2022, Explain how the TOP 5 category transaction value perform is?
 
 ```sql
 SELECT
     category,
-    ROUND(SUM(after_discount)::numeric) AS total_transaction_value_2021_2022
+    ROUND(AVG(CASE WHEN EXTRACT(YEAR FROM order_date) = 2021 THEN after_discount END)::numeric) AS average_transaction_value_2021,
+    ROUND(AVG(CASE WHEN EXTRACT(YEAR FROM order_date) = 2022 THEN after_discount END)::numeric) AS average_transaction_value_2022,
+    ROUND(SUM(CASE WHEN EXTRACT(YEAR FROM order_date) = 2021 THEN after_discount END)::numeric) AS total_transaction_value_2021,
+    ROUND(SUM(CASE WHEN EXTRACT(YEAR FROM order_date) = 2022 THEN after_discount END)::numeric) AS total_transaction_value_2022,
+    ROUND(SUM(CASE WHEN EXTRACT(YEAR FROM order_date) IN (2021, 2022) THEN after_discount END)::numeric) AS total_transaction_value_2021_2022
 FROM
     order_detail
 INNER JOIN
-    sku_detail
-ON
-    order_detail.sku_id = sku_detail.id
+    sku_detail ON order_detail.sku_id = sku_detail.id
 WHERE 
     order_detail.is_valid = true
-    AND (EXTRACT(YEAR FROM order_date) = 2021 OR EXTRACT(YEAR FROM order_date) = 2022)
+    AND EXTRACT(YEAR FROM order_date) IN (2021, 2022)
 GROUP BY
     category
 ORDER BY
-    total_transaction_value_2021_2022 DESC
+    total_transaction_value_2021 DESC
 LIMIT 5;
 ```
 
-![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/1d38a8ca-9461-4d5a-8bb7-15c589d50a39)
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/13f27a5e-903c-437e-a961-c6faeab19b0e)
+
+### Output : 
+
+### Transaction Analysis per Category
+
+| Category           | Average Transaction Value 2021 | Average Transaction Value 2022 | Total Transaction Value 2021 | Total Transaction Value 2022 | Total Transaction Value (2021-2022) |
+|--------------------|---------------------------------|---------------------------------|------------------------------|------------------------------|------------------------------------|
+| Mobiles & Tablets | 5,219,813                       | 11,625,969                      | 370,606,718                  | 918,451,576                  | 1,289,058,294                      |
+| Appliances         | 2,207,578                       | 2,614,530                       | 218,550,177                  | 316,358,100                  | 534,908,277                        |
+| Computing          | 1,879,118                       | 1,562,252                       | 172,878,860                  | 214,028,543                  | 386,907,403                        |
+| Entertainment      | 2,387,152                       | 2,854,251                       | 162,326,357                  | 365,344,149                  | 527,670,506                        |
+| Women Fashion      | 694,595                         | 650,454                         | 84,045,961                   | 93,014,971                   | 177,060,932                        |
 
 ---
 
-### 3. Compare the transaction values of each category in 2021 with 2022. Identify which categories experienced an increase and which categories experienced a decrease in transaction value from 2021 to 2022!
+## 3. Compare the transaction values of each category in 2021 with 2022. Identify which categories experienced an increase and which categories experienced a decrease in transaction value from 2021 to 2022!
 
 ```sql
 WITH transaction_cte AS (
     SELECT 
         sku_detail.category,
         EXTRACT(YEAR FROM order_detail.order_date) AS "year",
-        SUM(order_detail.after_discount) AS transaction_value
+        ROUND(SUM(order_detail.after_discount)) AS transaction_value
     FROM 
         order_detail
     INNER JOIN 
@@ -124,11 +170,33 @@ GROUP BY
 ;
 ```
 
-![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/ba0842e0-0082-4095-93f6-42efe3efdb2d)
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/9967e6e8-350a-4e66-8550-d52cb03b890d)
+
+### Output :
+
+### Transaction Analysis by Category
+
+| Category           | Transaction Value 2021 | Transaction Value 2022 | Trend     |
+|--------------------|------------------------|------------------------|-----------|
+| Appliances         | 218,550,177            | 316,358,100            | Increased |
+| Beauty & Grooming  | 46,047,360             | 46,211,019             | Increased |
+| Books              | 10,124,596             | 6,792,519              | Decreased |
+| Computing          | 172,878,860            | 214,028,543            | Increased |
+| Entertainment      | 162,326,357            | 365,344,149            | Increased |
+| Health & Sports    | 33,837,966             | 54,235,580             | Increased |
+| Home & Living      | 45,797,873             | 79,483,716             | Increased |
+| Kids & Baby        | 23,971,058             | 25,931,277             | Increased |
+| Men Fashion        | 58,628,198             | 135,588,253            | Increased |
+| Mobiles & Tablets  | 370,606,718            | 918,451,576            | Increased |
+| Others             | 40,468,516             | 21,744,646             | Decreased |
+| School & Education | 11,558,982             | 17,362,465             | Increased |
+| Soghaat            | 15,056,203             | 17,658,332             | Increased |
+| Superstore         | 28,828,088             | 32,643,267             | Increased |
+| Women Fashion      | 84,045,961             | 93,014,971             | Increased |
 
 ---
 
-### 4. Display the top 5 most popular payment methods used during 2021 and 2022 (based on total unique orders).
+## 4. Display the top 5 most popular payment methods used during 2021 and 2022 (based on total unique orders).
 
 ```sql
 SELECT
@@ -153,9 +221,21 @@ LIMIT 5;
 
 ![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/cba3c76b-105b-45ef-9243-27657fdc7174)
 
+### Output : 
+
+### Total Unique Orders per Payment Method
+
+| Payment Method | Total Unique Orders 2021 | Total Unique Orders 2022 |
+|----------------|--------------------------|--------------------------|
+| cod            | 1,591                    | 1,828                    |
+| Payaxis        | 79                       | 188                      |
+| customercredit | 39                       | 78                       |
+| Easypay        | 0                        | 70                       |
+| jazzwallet     | 10                       | 26                       |
+
 ---
 
-### 5. Sort these products based on their transaction values in 2021, 2022, and total transaction values from both year!
+## 5. Sort these products based on their transaction values in 2021, 2022, and total transaction values from both year!
 - Lenovo
 - Huawei
 - Sony
@@ -201,9 +281,21 @@ ORDER BY
 
 ![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/675489cb-2707-4e9c-98d0-0b51b2b54642)
 
+### Output : 
+
+### Total Transaction Value per Product
+
+| Product Names | Total Transaction Value 2021 | Total Transaction Value 2022 | Total Transaction Value |
+|---------------|-------------------------------|-------------------------------|-------------------------|
+| Samsung       | 176,406,304                   | 412,357,844                   | 588,764,148             |
+| Apple         | 257,200,768                   | 187,654,592                   | 444,855,360             |
+| Sony          | 31,617,540                    | 32,343,178                    | 63,960,718              |
+| Huawei        | 32,217,434                    | 30,942,826                    | 63,160,260              |
+| Lenovo        | 38,758,210                    | 23,621,590                    | 62,379,800              |
+
 ---
 
-### 6. What is the average transaction value (after discount) per order in 2021 and 2022?
+## 6. What is the average transaction value (after discount) per order in 2021 and 2022?
 
 ```sql
 SELECT
@@ -222,9 +314,18 @@ ORDER BY
 
 ![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/3180046b-823d-4973-9d03-120bd2a23e22)
 
+### Output : 
+
+### Average Transaction Value per Year
+
+| Year | Average Transaction Value |
+|------|---------------------------|
+| 2021 | 733,626                   |
+| 2022 | 1,061,498                 |
+
 ---
 
-### 7. Find out which day of the week had the highest average transaction value in 2021 and 2022.
+## 7. Find out which day of the week had the highest average transaction value in 2021 and 2022.
 
 ```sql
 SELECT
@@ -245,9 +346,23 @@ ORDER BY
 
 ![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/1189923b-cd75-4456-a840-7fd8855d928f)
 
+### Output : 
+
+### Daily Transaction Data
+
+| Day of Week | Day Name   | Average Transaction Value |
+|-------------|------------|---------------------------|
+| 2           | Tuesday    | 1,626,241                 |
+| 1           | Monday     | 869,605                   |
+| 3           | Wednesday  | 862,673                   |
+| 0           | Sunday     | 826,595                   |
+| 4           | Thursday   | 799,814                   |
+| 5           | Friday     | 731,191                   |
+| 6           | Saturday   | 673,273                   |
+
 ---
 
-### 8. Analyze the most popular product category by month in 2021 and 2022.
+## 8. Analyze the most popular product category by month in 2021 and 2022.
 
 ```sql
 WITH monthly_category_sales AS (
@@ -326,7 +441,7 @@ ORDER BY
 
 ---
 
-### 9. Calculate the total discount given on transactions in 2021 and 2022.
+## 9. Calculate the total discount given on transactions in 2021 and 2022.
 
 ```sql
 SELECT
@@ -354,7 +469,7 @@ ORDER BY
 
 ---
 
-### 10. Identify the percentage of transactions that were valid in 2021 and 2022.
+## 10. Identify the percentage of transactions that were valid in 2021 and 2022.
 
 ```sql
 WITH total_transactions AS (
@@ -399,7 +514,7 @@ ORDER BY
 
 ### Output : 
 
-## Orders Data
+### Orders Data
 
 | Year | Valid Orders | Total Orders | Percentage Valid |
 |------|--------------|--------------|------------------|
@@ -408,7 +523,7 @@ ORDER BY
 
 ---
 
-### 11. Analyze the correlation between the number of orders and the total transaction value for each month in 2021 and 2022.
+## 11. Analyze the correlation between the number of orders and the total transaction value for each month in 2021 and 2022.
 
 ```sql
 SELECT
@@ -433,7 +548,7 @@ ORDER BY
 
 ### Output :
 
-## Orders and Transaction Data
+### Orders and Transaction Data
 
 | Year | Month      | Total Orders | Total Transaction Value | Average Transaction Value |
 |------|------------|--------------|-------------------------|---------------------------|
