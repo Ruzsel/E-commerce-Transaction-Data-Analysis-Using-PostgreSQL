@@ -203,3 +203,264 @@ ORDER BY
 
 ---
 
+### 6. What is the average transaction value (after discount) per order in 2021 and 2022?
+
+```sql
+SELECT
+    EXTRACT(YEAR FROM order_date) AS year,
+    ROUND(AVG(after_discount::numeric)) AS average_transaction_value
+FROM
+    order_detail
+WHERE
+    is_valid = TRUE
+    AND EXTRACT(YEAR FROM order_date) IN (2021, 2022)
+GROUP BY
+    EXTRACT(YEAR FROM order_date)
+ORDER BY
+    year;
+```
+
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/3180046b-823d-4973-9d03-120bd2a23e22)
+
+---
+
+### 7. Find out which day of the week had the highest average transaction value in 2021 and 2022.
+
+```sql
+SELECT
+    EXTRACT(DOW FROM order_date) AS day_of_week,
+    TO_CHAR(order_date, 'Day') AS day_name,
+    ROUND(AVG(after_discount::numeric)) AS average_transaction_value
+FROM
+    order_detail
+WHERE
+    is_valid = TRUE
+    AND EXTRACT(YEAR FROM order_date) IN (2021, 2022)
+GROUP BY
+    EXTRACT(DOW FROM order_date),
+    day_name
+ORDER BY
+    average_transaction_value DESC;
+```
+
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/1189923b-cd75-4456-a840-7fd8855d928f)
+
+---
+
+### 8. Analyze the most popular product category by month in 2021 and 2022.
+
+```sql
+WITH monthly_category_sales AS (
+    SELECT
+        EXTRACT(YEAR FROM order_date) AS year,
+        EXTRACT(MONTH FROM order_date) AS month,
+        sku_detail.category,
+        SUM(after_discount) AS total_sales
+    FROM
+        order_detail
+    INNER JOIN
+        sku_detail
+    ON
+        order_detail.sku_id = sku_detail.id
+    WHERE
+        order_detail.is_valid = TRUE
+        AND EXTRACT(YEAR FROM order_date) IN (2021, 2022)
+    GROUP BY
+        EXTRACT(YEAR FROM order_date),
+        EXTRACT(MONTH FROM order_date),
+        sku_detail.category
+)
+SELECT
+    year,
+    month,
+    category,
+    total_sales
+FROM
+    (
+        SELECT
+            year,
+            month,
+            category,
+            total_sales,
+            ROW_NUMBER() OVER (PARTITION BY year, month ORDER BY total_sales DESC) AS rank
+        FROM
+            monthly_category_sales
+    ) ranked_categories
+WHERE
+    rank = 1
+ORDER BY
+    year, month;
+```
+
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/24a8ae15-c0d6-4241-9811-778e511d9d10)
+
+
+### Output : 
+
+| Year | Month | Category            | Total Sales   |
+|------|-------|---------------------|---------------|
+| 2021 | 1     | Mobiles & Tablets   | 13,252,594    |
+| 2021 | 2     | Mobiles & Tablets   | 12,390,192    |
+| 2021 | 3     | Appliances          | 5,932,530     |
+| 2021 | 4     | Appliances          | 7,420,636     |
+| 2021 | 5     | Computing           | 11,692,278    |
+| 2021 | 6     | Mobiles & Tablets   | 14,137,384    |
+| 2021 | 7     | Entertainment       | 36,058,658    |
+| 2021 | 8     | Mobiles & Tablets   | 102,274,126   |
+| 2021 | 9     | Mobiles & Tablets   | 35,939,468    |
+| 2021 | 10    | Mobiles & Tablets   | 84,725,298    |
+| 2021 | 11    | Computing           | 33,716,212    |
+| 2021 | 12    | Computing           | 52,286,420    |
+| 2022 | 1     | Entertainment       | 47,904,868    |
+| 2022 | 2     | Mobiles & Tablets   | 44,601,536    |
+| 2022 | 3     | Mobiles & Tablets   | 56,620,992    |
+| 2022 | 4     | Entertainment       | 94,788,472    |
+| 2022 | 5     | Mobiles & Tablets   | 44,915,432    |
+| 2022 | 6     | Entertainment       | 26,440,286    |
+| 2022 | 7     | Mobiles & Tablets   | 96,057,164    |
+| 2022 | 8     | Mobiles & Tablets   | 20,960,504    |
+| 2022 | 9     | Mobiles & Tablets   | 528,031,420   |
+| 2022 | 10    | Entertainment       | 14,373,502    |
+| 2022 | 11    | Mobiles & Tablets   | 10,726,926    |
+| 2022 | 12    | Mobiles & Tablets   | 15,726,642    |
+
+---
+
+### 9. Calculate the total discount given on transactions in 2021 and 2022.
+
+```sql
+SELECT
+    EXTRACT(YEAR FROM order_date) AS year,
+    ROUND(SUM(before_discount - after_discount)::numeric) AS total_discount
+FROM
+    order_detail
+WHERE
+    is_valid = TRUE
+    AND EXTRACT(YEAR FROM order_date) IN (2021, 2022)
+GROUP BY
+    EXTRACT(YEAR FROM order_date)
+ORDER BY
+    year;
+```
+
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/b6fb5209-d28f-4498-9f6f-aecccbf3b693)
+
+### Output : 
+
+| Year | Total Discount |
+|------|----------------|
+| 2021 | 8,008,122      |
+| 2022 | 7,891,420      |
+
+---
+
+### 10. Identify the percentage of transactions that were valid in 2021 and 2022.
+
+```sql
+WITH total_transactions AS (
+    SELECT
+        EXTRACT(YEAR FROM order_date) AS year,
+        COUNT(*) AS total_orders
+    FROM
+        order_detail
+    WHERE
+        EXTRACT(YEAR FROM order_date) IN (2021, 2022)
+    GROUP BY
+        EXTRACT(YEAR FROM order_date)
+),
+valid_transactions AS (
+    SELECT
+        EXTRACT(YEAR FROM order_date) AS year,
+        COUNT(*) AS valid_orders
+    FROM
+        order_detail
+    WHERE
+        is_valid = TRUE
+        AND EXTRACT(YEAR FROM order_date) IN (2021, 2022)
+    GROUP BY
+        EXTRACT(YEAR FROM order_date)
+)
+SELECT
+    total_transactions.year,
+    valid_transactions.valid_orders,
+    total_transactions.total_orders,
+    ROUND((valid_transactions.valid_orders * 100.0 / total_transactions.total_orders)::numeric, 2) AS percentage_valid
+FROM
+    total_transactions
+INNER JOIN
+    valid_transactions
+ON
+    total_transactions.year = valid_transactions.year
+ORDER BY
+    total_transactions.year;
+```
+
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/ff637007-c30c-459e-a251-d3982f42c140)
+
+### Output : 
+
+## Orders Data
+
+| Year | Valid Orders | Total Orders | Percentage Valid |
+|------|--------------|--------------|------------------|
+| 2021 | 1,803        | 2,623        | 68.74%           |
+| 2022 | 2,209        | 3,261        | 67.74%           |
+
+---
+
+### 11. Analyze the correlation between the number of orders and the total transaction value for each month in 2021 and 2022.
+
+```sql
+SELECT
+    EXTRACT(YEAR FROM order_date) AS year,
+    TO_CHAR(order_date, 'FMMonth') AS month,
+    COUNT(*) AS total_orders,
+    ROUND(SUM(after_discount::numeric)) AS total_transaction_value,
+    ROUND(AVG(after_discount::numeric)) AS average_transaction_value
+FROM
+    order_detail
+WHERE
+    is_valid = TRUE
+    AND EXTRACT(YEAR FROM order_date) IN (2021, 2022)
+GROUP BY
+    EXTRACT(YEAR FROM order_date),
+    TO_CHAR(order_date, 'FMMonth')
+ORDER BY
+    total_transaction_value DESC;
+```
+
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/2b746231-d884-4366-8071-573fd6c83305)
+
+### Output :
+
+## Orders and Transaction Data
+
+| Year | Month      | Total Orders | Total Transaction Value | Average Transaction Value |
+|------|------------|--------------|-------------------------|---------------------------|
+| 2022 | September  | 73           | 559,290,228             | 7,661,510                 |
+| 2022 | April      | 238          | 276,472,259             | 1,161,648                 |
+| 2022 | July       | 271          | 267,110,983             | 985,649                   |
+| 2022 | March      | 282          | 262,738,614             | 931,697                   |
+| 2022 | January    | 299          | 238,541,883             | 797,799                   |
+| 2021 | August     | 267          | 227,862,744             | 853,419                   |
+| 2021 | December   | 258          | 217,309,963             | 842,287                   |
+| 2022 | May        | 248          | 210,799,584             | 849,998                   |
+| 2021 | October    | 242          | 207,603,260             | 857,865                   |
+| 2021 | November   | 212          | 180,396,010             | 850,925                   |
+| 2022 | February   | 247          | 173,937,985             | 704,202                   |
+| 2021 | July       | 248          | 148,007,735             | 596,805                   |
+| 2021 | September  | 243          | 145,943,335             | 600,590                   |
+| 2022 | June       | 231          | 117,950,824             | 510,610                   |
+| 2022 | August     | 88           | 76,025,460              | 863,926                   |
+| 2022 | December   | 83           | 57,809,020              | 696,494                   |
+| 2022 | October    | 72           | 56,247,211              | 781,211                   |
+| 2022 | November   | 77           | 47,924,364              | 622,394                   |
+| 2021 | June       | 58           | 43,154,552              | 744,044                   |
+| 2021 | January    | 56           | 36,822,127              | 657,538                   |
+| 2021 | February   | 57           | 35,611,797              | 624,768                   |
+| 2021 | May        | 56           | 34,163,856              | 610,069                   |
+| 2021 | March      | 49           | 23,643,062              | 482,511                   |
+| 2021 | April      | 57           | 22,208,473              | 389,622                   |
+
+---
+
