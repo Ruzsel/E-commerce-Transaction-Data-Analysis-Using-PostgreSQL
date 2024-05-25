@@ -2,9 +2,9 @@
 This project focuses on analyzing e-commerce transaction data using PostgreSQL. The dataset includes detailed information about orders, products, customers, and payment methods, allowing for comprehensive analysis of sales performance, customer behavior, and product trends.
 
 # Table of Contents
-[Data Structure](#data-structure)
-[Bussines Questions](#bussines-questions)
-[Insight and Bussines Solution](#insight-and-bussines-solutions)
+- [Data Structure](#data-structure)
+- [Bussines Questions](#bussines-questions)
+- [Insight and Bussines Solution](#insight-and-bussines-solutions)
 
 ## Dataset Description
 The project includes the following tables:
