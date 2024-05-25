@@ -38,7 +38,7 @@ The project includes the following tables:
   - id: Unique number of the payment method.
   - payment_method: Payment method used.
 
-## Bussines Questions
+# Bussines Questions
 ## 1. During transactions that occurred both in 2021 and 2022, how did the discount amount value (discount_amount) perform in each month?
 
 ```sql
@@ -579,3 +579,75 @@ ORDER BY
 
 ---
 
+# Insight and Bussines Solutions
+### Insight 1: Monthly Discount Performance
+- **Years 2021 and 2022**:
+  - The highest discount occurred in November 2021, with a total discount value of 7,178,397 and an average of 33,860.
+  - Discounts in December 2022 were also significant, with a total of 1,658,148 and an average of 19,978.
+
+### Solution:
+1. **Seasonal Promotions**: Utilize this pattern to plan major promotional and discount campaigns in November and December each year. This will help maximize sales and attract more customers during these periods.
+
+### Insight 2: Top Performing Categories
+- **Top 5 Categories**:
+  - `Mobiles & Tablets` had the highest combined transaction value in 2021 and 2022.
+  - `Appliances` and `Entertainment` also showed strong performance across both years.
+
+### Solution:
+2. **Focus on Key Categories**: Prioritize inventory and marketing campaigns for `Mobiles & Tablets`, `Appliances`, and `Entertainment`. This can help drive further sales in already popular categories.
+
+### Insight 3: Transaction Value Comparison by Category
+- Most categories experienced an increase in transaction value from 2021 to 2022, except for `Books` and `Others`.
+
+### Solution:
+3. **Targeted Sales Strategies**: Reevaluate sales strategies for categories that saw a decline, like `Books` and `Others`. Consider bundling offers, special promotions, or enhancing product visibility within these categories.
+
+### Insight 4: Popular Payment Methods
+- `COD` (Cash on Delivery) is the most popular payment method in both 2021 and 2022.
+
+### Solution:
+4. **Payment Options**: Ensure that the `COD` method is easily accessible and optimized, as many customers prefer this method. Additionally, promote other payment methods like `Payaxis` and `customercredit` to diversify payment options and reduce risks associated with cash transactions.
+
+### Insight 5: Transaction Values by Product
+- `Samsung` and `Apple` showed the highest transaction values during 2021 and 2022.
+
+### Solution:
+5. **Brand Partnerships**: Consider forming partnerships or collaborations with popular brands like `Samsung` and `Apple` for exclusive promotions, which can attract more buyers.
+
+### Insight 6: Average Transaction Value
+- The average transaction value increased from 733,626 in 2021 to 1,061,498 in 2022.
+
+### Solution:
+6. **Upselling and Cross-selling**: Leverage this increase with more aggressive upselling and cross-selling strategies, such as offering additional products or premium services to customers.
+
+### Insight 7: Highest Transaction Value Days
+- **Tuesday** had the highest average transaction value.
+
+### Solution:
+7. **Special Day Promotions**: Utilize Tuesdays for running daily promotional campaigns or special offers to drive more transactions.
+
+### Insight 8: Most Popular Product Category by Month
+- `Mobiles & Tablets` frequently emerged as the most popular category, especially in certain months.
+
+### Solution:
+8. **Stock Adjustment**: Ensure to adjust stock and promotional campaigns based on monthly trends for popular categories like `Mobiles & Tablets`, to ensure sufficient product availability and avoid stockouts.
+
+### Insight 9: Total Discounts Given
+- Total discounts given in 2021 and 2022 were nearly balanced.
+
+### Solution:
+9. **Discount Optimization**: Evaluate the effectiveness of given discounts and consider optimizing discount strategies to increase ROI. Focus on discounts that have proven to attract more buyers without compromising profit margins.
+
+### Insight 10: Percentage of Valid Transactions
+- The percentage of valid transactions was high in both years but slightly decreased from 68.74% in 2021 to 67.74% in 2022.
+
+### Solution:
+10. **Improving Transaction Validity**: Enhance the transaction verification process and order management to increase the percentage of valid transactions. This can involve staff training, using fraud detection technology, and improving payment processing systems.
+
+### Insight 11: Correlation Between Orders and Transaction Value
+- There are months with high transaction values despite fewer orders, indicating high-value transactions.
+
+### Solution:
+11. **High-Value Transaction Analysis**: Conduct in-depth analysis to understand the patterns and characteristics of high-value transactions. Focus on customers making these transactions for more effective retention and loyalty strategies.
+
+By implementing these solutions, businesses can improve sales performance, refine marketing strategies, and enhance overall operational efficiency.
