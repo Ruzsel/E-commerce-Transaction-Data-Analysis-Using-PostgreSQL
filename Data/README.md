@@ -1,1 +1,1 @@
-This File is Containt "data".csv and "query".sql files
+This Folder is Containt "data".csv and "query".sql files
