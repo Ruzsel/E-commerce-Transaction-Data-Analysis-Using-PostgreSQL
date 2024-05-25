@@ -67,30 +67,31 @@ ORDER BY
 
 | year | month      | total_discount_value | average_discount_value |
 |------|------------|----------------------|------------------------|
-| 2021 | November   | 7178397              | 33860                  |
-| 2022 | December   | 1658148              | 19978                  |
-| 2022 | July       | 1353240              | 4994                   |
-| 2022 | May        | 884502               | 3567                   |
-| 2022 | April      | 863557               | 3628                   |
-| 2022 | June       | 858297               | 3716                   |
-| 2022 | November   | 851722               | 11061                  |
-| 2021 | September  | 598258               | 2462                   |
-| 2022 | March      | 467300               | 1657                   |
-| 2022 | January    | 304707               | 1019                   |
-| 2022 | October    | 238873               | 3318                   |
-| 2022 | August     | 207768               | 2361                   |
-| 2022 | February   | 128483               | 520                    |
-| 2021 | July       | 98066                | 395                    |
-| 2022 | September  | 74822                | 1025                   |
-| 2021 | June       | 58000                | 1000                   |
-| 2021 | October    | 29000                | 120                    |
-| 2021 | May        | 29000                | 518                    |
-| 2021 | March      | 11600                | 237                    |
-| 2021 | December   | 5800                 | 22                     |
+| 2021 | November   | 7,178,397            | 33,860                 |
+| 2022 | December   | 1,658,148            | 19,978                 |
+| 2022 | July       | 1,353,240            | 4,994                  |
+| 2022 | May        | 884,502              | 3,567                  |
+| 2022 | April      | 863,557              | 3,628                  |
+| 2022 | June       | 858,297              | 3,716                  |
+| 2022 | November   | 851,722              | 11,061                 |
+| 2021 | September  | 598,258              | 2,462                  |
+| 2022 | March      | 467,300              | 1,657                  |
+| 2022 | January    | 304,707              | 1,019                  |
+| 2022 | October    | 238,873              | 3,318                  |
+| 2022 | August     | 207,768              | 2,361                  |
+| 2022 | February   | 128,483              | 520                    |
+| 2021 | July       | 98,066               | 395                    |
+| 2022 | September  | 74,822               | 1,025                  |
+| 2021 | June       | 58,000               | 1,000                  |
+| 2021 | October    | 29,000               | 120                    |
+| 2021 | May        | 29,000               | 518                    |
+| 2021 | March      | 11,600               | 237                    |
+| 2021 | December   | 5,800                | 22                     |
 | 2021 | April      | 0                    | 0                      |
 | 2021 | August     | 0                    | 0                      |
 | 2021 | January    | 0                    | 0                      |
 | 2021 | February   | 0                    | 0                      |
+
 
 ---
 
@@ -365,12 +366,12 @@ ORDER BY
 ## 8. Analyze the most popular product category by month in 2021 and 2022.
 
 ```sql
-WITH monthly_category_sales AS (
+WITH monthly_category_value AS (
     SELECT
         EXTRACT(YEAR FROM order_date) AS year,
         EXTRACT(MONTH FROM order_date) AS month,
         sku_detail.category,
-        SUM(after_discount) AS total_sales
+        SUM(after_discount) AS total_transaction_value
     FROM
         order_detail
     INNER JOIN
@@ -389,17 +390,17 @@ SELECT
     year,
     month,
     category,
-    total_sales
+    total_transaction_value
 FROM
     (
         SELECT
             year,
             month,
             category,
-            total_sales,
-            ROW_NUMBER() OVER (PARTITION BY year, month ORDER BY total_sales DESC) AS rank
+            total_transaction_value,
+            ROW_NUMBER() OVER (PARTITION BY year, month ORDER BY total_transaction_value DESC) AS rank
         FROM
-            monthly_category_sales
+            monthly_category_value
     ) ranked_categories
 WHERE
     rank = 1
@@ -407,12 +408,11 @@ ORDER BY
     year, month;
 ```
 
-![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/24a8ae15-c0d6-4241-9811-778e511d9d10)
-
+![image](https://github.com/Ruzsel/E-commerce-Transaction-Data-Analysis-Using-PostgreSQL/assets/150054552/fd469a01-e71d-4cb7-af08-db9995aaf1d6)
 
 ### Output : 
 
-| Year | Month | Category            | Total Sales   |
+| Year | Month | Category            | Total transaction value   |
 |------|-------|---------------------|---------------|
 | 2021 | 1     | Mobiles & Tablets   | 13,252,594    |
 | 2021 | 2     | Mobiles & Tablets   | 12,390,192    |
