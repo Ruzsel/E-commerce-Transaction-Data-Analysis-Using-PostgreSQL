@@ -671,7 +671,7 @@ ALTER COLUMN is_valid SET DATA TYPE integer USING CASE WHEN is_valid THEN 1 ELSE
 ALTER COLUMN is_net SET DATA TYPE integer USING CASE WHEN is_net THEN 1 ELSE 0 END;
 ```
 ## Selected Columns for Export to Google Looker Studio
-The query selects specific columns from our database, which we intend to export as a CSV file for utilization in Google Looker Studio. These columns are carefully chosen to facilitate insightful visualizations and analyses within the Looker environment.
+The query selects specific columns from our database, which i intend to export as a CSV file for utilization in Google Looker Studio. These columns are carefully chosen to facilitate insightful visualizations and analyses within the Looker environment.
 
 ```sql
 SELECT order_detail.id, order_detail.customer_id, order_detail.sku_id, order_detail.payment_id, 
