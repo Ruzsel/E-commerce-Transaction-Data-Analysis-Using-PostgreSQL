@@ -661,6 +661,17 @@ By implementing these solutions, businesses can improve sales performance, refin
 ---
 
 # Preparing Data for Looker Studio Dashboard
+## Alter Data Types of Boolean Columns in order_detail Table
+This SQL script alters the data types of boolean columns in the order_detail table to integers in order to represent true/false values as 1/0 respectively. This alteration is performed to align with the database schema requirements or data analysis needs.
+
+```sql
+ALTER TABLE order_detail
+ALTER COLUMN is_gross SET DATA TYPE integer USING CASE WHEN is_gross THEN 1 ELSE 0 END,
+ALTER COLUMN is_valid SET DATA TYPE integer USING CASE WHEN is_valid THEN 1 ELSE 0 END,
+ALTER COLUMN is_net SET DATA TYPE integer USING CASE WHEN is_net THEN 1 ELSE 0 END;
+```
+## Selected Columns for Export to Google Looker Studio
+The query selects specific columns from our database, which we intend to export as a CSV file for utilization in Google Looker Studio. These columns are carefully chosen to facilitate insightful visualizations and analyses within the Looker environment.
 
 ```sql
 SELECT order_detail.id, order_detail.customer_id, order_detail.sku_id, order_detail.payment_id, 
